@@ -1,0 +1,105 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================
+    // GLOBAL REUSABLE FUNCTIONS & IDENTITY TIERS
+    // ==========================================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'biswasrishikseh606@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    // ==========================================
+    // TEST & HEALTH CHECK COLLECTION
+    // ==========================================
+    match /test/{testId} {
+      allow read, write: if true;
+    }
+
+    // ==========================================
+    // USER PROFILES & ACCOUNTS
+    // ==========================================
+    match /users/{userId} {
+      allow get: if isValidId(userId);
+      allow list: if true;
+      allow create, update: if isValidId(userId);
+      allow delete: if isAdmin() || isOwner(userId);
+    }
+
+    // ==========================================
+    // PATIENTS (Kiosk Registration & ABHA Profiles)
+    // ==========================================
+    match /patients/{patientId} {
+      allow get: if isValidId(patientId);
+      allow list: if true;
+      allow create, update: if isValidId(patientId);
+      allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // CLINICAL CONSULTATION CASES & OPD QUEUE
+    // ==========================================
+    match /cases/{caseId} {
+      allow get: if isValidId(caseId);
+      allow list: if true;
+      allow create, update: if isValidId(caseId);
+      allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // APPOINTMENTS & TOKENS
+    // ==========================================
+    match /appointments/{appointmentId} {
+      allow get: if isValidId(appointmentId);
+      allow list: if true;
+      allow create, update: if isValidId(appointmentId);
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    // ==========================================
+    // CLINICAL INTAKE & CONSULTATION RECORDS
+    // ==========================================
+    match /clinicalRecords/{recordId} {
+      allow get: if isValidId(recordId);
+      allow list: if true;
+      allow create, update: if isValidId(recordId);
+      allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // PATIENT TRIAGE & ASSISTANT CHATS
+    // ==========================================
+    match /userChats/{chatId} {
+      allow read, write: if isValidId(chatId);
+    }
+
+    // ==========================================
+    // ADMINS CONFIG
+    // ==========================================
+    match /admins/{adminId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Default Fallback
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

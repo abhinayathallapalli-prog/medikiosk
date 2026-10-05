@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediKiosk - AI Clinical History Platform | All India Institute of Ayurveda</title>
+    <meta name="description" content="Patient-facing AI clinical history kiosk with multimodal Bhashini voice/touch intake, Dashavidha Pariksha, medical document OCR, red-flag triage, and ABDM/FHIR physician summary." />
+    <meta property="og:title" content="MediKiosk - AI Clinical History Platform" />
+    <meta property="og:description" content="Patient-facing AI clinical history intake kiosk with multimodal voice/touch intake, Ayush Dashavidha Pariksha, and ABDM FHIR EMR integration." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/index.css" />
+
+    <style>
+      @keyframes medikiosk-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+
+    <script>
+      (function() {
+        function reportError(details) {
+          try {
+            fetch('/api/client-error', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(details),
+            }).catch(function() {});
+          } catch(e) {}
+        }
+
+        window.addEventListener('error', function(event) {
+          var msg = event.message || String(event);
+          if (
+            msg.includes('WebSocket') ||
+            msg.includes('@vite/client') ||
+            msg.includes('ResizeObserver') ||
+            msg.includes('AudioContext')
+          ) {
+            return;
+          }
+          var payload = {
+            type: 'window.error',
+            message: msg,
+            source: event.filename || '',
+            lineno: event.lineno,
+            colno: event.colno,
+            stack: (event.error && event.error.stack) || '',
+            url: window.location.href,
+          };
+          console.warn('[MediKiosk Window Event]', payload);
+          reportError(payload);
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+          var reason = event.reason || 'Unhandled promise rejection';
+          var reasonStr = String(reason);
+          var stackStr = (reason && reason.stack) || '';
+          if (
+            reasonStr.includes('WebSocket') ||
+            stackStr.includes('WebSocket') ||
+            stackStr.includes('@vite/client') ||
+            reasonStr.includes('closed without opened') ||
+            reasonStr.includes('The play() request was interrupted') ||
+            reasonStr.includes('user didn\'t interact with the document first')
+          ) {
+            return;
+          }
+          var payload = {
+            type: 'unhandledrejection',
+            reason: reasonStr,
+            stack: stackStr,
+            url: window.location.href,
+          };
+          console.warn('[MediKiosk Handled Rejection]', payload);
+          reportError(payload);
+        });
+      })();
+    </script>
+  </head>
+  <body class="bg-[#C9C5AF] text-[#26312B] font-sans antialiased selection:bg-[#B99B6B]/30 selection:text-[#29483C] min-h-screen">
+    <!-- Standalone Initial Splash Overlay (Fades out when React mounts) -->
+    <div id="medikiosk-initial-loader" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background-color:#C9C5AF;color:#26312B;font-family:sans-serif;z-index:9999;transition:opacity 0.25s ease-out;pointer-events:none;">
+      <div style="text-align:center;padding:24px;max-width:400px;pointer-events:auto;">
+        <div style="width:44px;height:44px;border:3px solid #A9AA94;border-top-color:#29483C;border-radius:50%;margin:0 auto 16px;animation:medikiosk-spin 0.8s linear infinite;"></div>
+        <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;color:#26312B;">MediKiosk Terminal</h2>
+        <p style="margin:0;font-size:13px;color:#596058;">All India Institute of Ayurveda • Loading Clinical Intake...</p>
+      </div>
+    </div>
+
+    <!-- React Clean Root Container -->
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

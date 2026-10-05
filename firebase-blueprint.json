@@ -1,0 +1,134 @@
+{
+  "entities": {
+    "user": {
+      "title": "User",
+      "description": "Registered patient, doctor or staff profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "phone": { "type": "string" },
+        "abhaId": { "type": "string" },
+        "role": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid"]
+    },
+    "appointment": {
+      "title": "Appointment",
+      "description": "OPD Consultation Appointment Booking & Token",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "patientId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "age": { "type": "string" },
+        "gender": { "type": "string" },
+        "phone": { "type": "string" },
+        "abhaId": { "type": "string" },
+        "department": { "type": "string" },
+        "roomNumber": { "type": "string" },
+        "tokenNumber": { "type": "string" },
+        "status": { "type": "string" },
+        "chiefComplaint": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "registeredAt": { "type": "string" }
+      },
+      "required": ["id", "tokenNumber"]
+    },
+    "clinicalRecord": {
+      "title": "ClinicalRecord",
+      "description": "Digitized intake history, Ayush examination, and physician notes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "appointmentId": { "type": "string" },
+        "userId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "tokenNumber": { "type": "string" },
+        "chiefComplaint": { "type": "string" },
+        "verifiedByPhysician": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id"]
+    },
+    "patient": {
+      "title": "Patient",
+      "description": "Registered or walk-in patient profile at the OPD kiosk",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientId": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "age": { "type": "number" },
+        "gender": { "type": "string" },
+        "preferredLanguage": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name"]
+    },
+    "patientCase": {
+      "title": "PatientCase",
+      "description": "Clinical intake case submitted from kiosk for physician review and consultation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "caseId": { "type": "string" },
+        "patientId": { "type": "string" },
+        "tokenNumber": { "type": "string" },
+        "department": { "type": "string" },
+        "roomNumber": { "type": "string" },
+        "status": { "type": "string" },
+        "chiefComplaint": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "department"]
+    },
+    "chatMessage": {
+      "title": "ChatMessage",
+      "description": "Patient assistant and triaging chat sessions",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "role": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["role", "text"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "user",
+      "description": "User profile with personal identity info"
+    },
+    "/patients/{patientId}": {
+      "schema": "patient",
+      "description": "Patient records created at kiosk"
+    },
+    "/cases/{caseId}": {
+      "schema": "patientCase",
+      "description": "Patient clinical cases and consultation queue"
+    },
+    "/appointments/{appointmentId}": {
+      "schema": "appointment",
+      "description": "Collection of patient OPD bookings and tokens"
+    },
+    "/clinicalRecords/{recordId}": {
+      "schema": "clinicalRecord",
+      "description": "Collection of clinical consultation records and physician notes"
+    },
+    "/userChats/{chatId}": {
+      "schema": "chatMessage",
+      "description": "Triaging and patient consultation conversation transcripts"
+    },
+    "/test/{testId}": {
+      "schema": "user",
+      "description": "Connection test document"
+    }
+  }
+}
